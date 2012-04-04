@@ -253,6 +253,52 @@ static void SetVolumeScalar(AudioDeviceID inDevice, bool inIsInput, UInt32 inCha
   SetVolumeScalar(deviceID, TRUE, 0, level);
 }
 
+- (IBAction)toggleDisplayVolumeControls:(id)sender {
+  
+  NSWindow *window = [[self view] window];
+  NSRect w_frame = [window frame];
+  CGFloat w_height = w_frame.size.height;
+  NSPoint w_origin = w_frame.origin;
+  
+  NSRect my_frame = [[self view] frame];
+  CGFloat my_height = my_frame.size.height;
+  NSPoint my_origin = my_frame.origin;
+  
+  NSLog(@"start w_h: %f my_h: %f",w_frame.size.height, my_frame.size.height);
+  
+  NSLog(@"start w_x: %f w_y: %f my_x: %f my_y: %f",
+        w_origin.x,
+        w_origin.y,
+        my_origin.x,
+        my_origin.y);
+  
+  
+  
+  if (w_height == 107) {
+    // make it bigger
+    w_frame.size.height = 152;
+    my_frame.size.height = 130;
+    
+  } else {
+    // make it smaller
+    w_frame.size.height = 107;
+    my_frame.size.height = 85;
+  }
+  
+  NSLog(@"finish w_h: %f my_h: %f",w_frame.size.height, my_frame.size.height);
+  
+  NSLog(@"finish w_x: %f w_y: %f my_x: %f my_y: %f",
+        w_origin.x,
+        w_origin.y,
+        my_origin.x,
+        my_origin.y);
+  
+  [window setFrame:w_frame
+           display:YES
+           animate:NO];
+  [[self view] setFrame:my_frame];
+}
+
 
 #pragma mark -
 #pragma mark NSResponder overrides
@@ -410,5 +456,4 @@ static void SetVolumeScalar(AudioDeviceID inDevice, bool inIsInput, UInt32 inCha
                                           theSize,
                                           &level);
   }
-
 }

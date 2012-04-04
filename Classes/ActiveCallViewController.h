@@ -50,6 +50,7 @@
   NSButton *hangUpButton_;
   NSSlider *volumeSlider_;
   NSSlider *micSlider_;
+  BOOL volumeControlsVisible_;
 }
 
 // Call controller the receiver belongs to.
@@ -117,4 +118,7 @@
 
 // Set Mic level.
 - (IBAction)setMicLevel:(id)sender;
+
+// Show Volume Controls
+- (IBAction)toggleDisplayVolumeControls:(id)sender;
 @end

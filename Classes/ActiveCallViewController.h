@@ -29,6 +29,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <AudioToolbox/AudioServices.h>
 
 #import "AKActiveCallView.h"
 #import "XSViewController.h"
@@ -47,6 +48,8 @@
   NSTextField *statusField_;
   AKResponsiveProgressIndicator *callProgressIndicator_;
   NSButton *hangUpButton_;
+  NSSlider *volumeSlider_;
+  NSSlider *micSlider_;
 }
 
 // Call controller the receiver belongs to.
@@ -74,6 +77,12 @@
 
 // Hang-up button outlet.
 @property (nonatomic, retain) IBOutlet NSButton *hangUpButton;
+
+// Output Volume Slider
+@property (nonatomic, retain) IBOutlet NSSlider *volumeSlider;
+
+// Input Volume Slider
+@property (nonatomic, retain) IBOutlet NSSlider *micSlider;
 
 
 // Designated initializer.
@@ -103,4 +112,9 @@
 // Method to be called when call timer fires.
 - (void)callTimerTick:(NSTimer *)theTimer;
 
+// Set volume level.
+- (IBAction)setVolumeLevel:(id)sender;
+
+// Set Mic level.
+- (IBAction)setMicLevel:(id)sender;
 @end

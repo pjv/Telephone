@@ -38,6 +38,10 @@
 #import "CallTransferController.h"
 #import "EndedCallViewController.h"
 
+#import "AppController.h"
+
+static Float32 GetVolumeScalar(AudioDeviceID inDevice, bool inIsInput, UInt32 inChannel);
+static void SetVolumeScalar(AudioDeviceID inDevice, bool inIsInput, UInt32 inChannel, Float32 level);
 
 @implementation ActiveCallViewController
 
@@ -50,6 +54,8 @@
 @synthesize statusField = statusField_;
 @synthesize callProgressIndicator = callProgressIndicator_;
 @synthesize hangUpButton = hangUpButton_;
+@synthesize volumeSlider = volumeSlider_;
+@synthesize micSlider = micSlider_;
 
 - (id)initWithNibName:(NSString *)nibName
        callController:(CallController *)callController {
@@ -83,6 +89,8 @@
   [statusField_ release];
   [callProgressIndicator_ release];
   [hangUpButton_ release];
+  [volumeSlider_ release];
+  [micSlider_ release];
   
   [super dealloc];
 }
@@ -125,6 +133,29 @@
   // Add support for clicking call progress indicator to hang-up.
   [[self callProgressIndicator] setTarget:self];
   [[self callProgressIndicator] setAction:@selector(hangUpCall:)];
+  
+  // set output volume slider
+  Float32 volume;
+  
+  NSInteger theIndex = [[NSApp delegate] soundOutputDeviceIndex];
+  NSArray *devices = [[NSApp delegate] audioDevices];
+  NSDictionary *deviceDict = [devices objectAtIndex:theIndex];
+  
+  NSNumber *d = [deviceDict objectForKey:kAudioDeviceIdentifier];
+  AudioDeviceID deviceID = [d integerValue];
+  
+  volume = GetVolumeScalar(deviceID, FALSE, 1);
+  //NSLog(@"output volume: %f",volume);
+  self.volumeSlider.integerValue = (int) (volume*100);
+  
+  // set mic level slider
+  theIndex = [[NSApp delegate] soundInputDeviceIndex];
+  d = [deviceDict objectForKey:kAudioDeviceIdentifier];
+  deviceID = [d integerValue];
+  
+  volume = GetVolumeScalar(deviceID, TRUE, 0);
+  //NSLog(@"input volume: %f",volume);
+  self.micSlider.integerValue = (int) (volume*100);
 }
 
 - (IBAction)hangUpCall:(id)sender {
@@ -189,6 +220,37 @@
                 (seconds / 60) % 60,
                 seconds % 60]];
   }
+}
+
+- (IBAction)setVolumeLevel:(id)sender {
+  Float32 level;
+  
+  NSInteger theIndex = [[NSApp delegate] soundOutputDeviceIndex];
+  NSArray *devices = [[NSApp delegate] audioDevices];
+  NSDictionary *deviceDict = [devices objectAtIndex:theIndex];
+  
+  NSNumber *d = [deviceDict objectForKey:kAudioDeviceIdentifier];
+  AudioDeviceID deviceID = [d integerValue];
+  
+  level = (Float32) [sender integerValue] / 100;
+  
+  SetVolumeScalar(deviceID, FALSE, 1, level);
+  
+}
+
+- (IBAction)setMicLevel:(id)sender {
+  Float32 level;
+  
+  NSInteger theIndex = [[NSApp delegate] soundInputDeviceIndex];
+  NSArray *devices = [[NSApp delegate] audioDevices];
+  NSDictionary *deviceDict = [devices objectAtIndex:theIndex];
+  
+  NSNumber *d = [deviceDict objectForKey:kAudioDeviceIdentifier];
+  AudioDeviceID deviceID = [d integerValue];
+  
+  level = (Float32) [sender integerValue] / 100;
+  
+  SetVolumeScalar(deviceID, TRUE, 0, level);
 }
 
 
@@ -300,3 +362,53 @@
 }
 
 @end
+
+#pragma mark -
+static Float32 GetVolumeScalar(AudioDeviceID inDevice, bool inIsInput, UInt32 inChannel)
+{
+  Float32 theAnswer = 0;
+  UInt32 theSize = sizeof(Float32);
+  AudioObjectPropertyScope theScope = inIsInput ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput;
+  AudioObjectPropertyAddress theAddress = { kAudioDevicePropertyVolumeScalar,
+    theScope,
+    inChannel };
+  
+  OSStatus theError = AudioObjectGetPropertyData(inDevice,
+                                                 &theAddress,
+                                                 0,
+                                                 NULL,
+                                                 &theSize,
+                                                 &theAnswer);
+  // handle errors
+  
+  return theAnswer;
+}
+
+static void SetVolumeScalar(AudioDeviceID inDevice, bool inIsInput, UInt32 inChannel, Float32 level)
+{
+  UInt32 theSize = sizeof(Float32);
+  AudioObjectPropertyScope theScope = inIsInput ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput;
+  AudioObjectPropertyAddress theAddress = { kAudioDevicePropertyVolumeScalar,
+    theScope,
+    inChannel };
+  
+  OSStatus theError = AudioObjectSetPropertyData(inDevice,
+                                                 &theAddress,
+                                                 0,
+                                                 NULL,
+                                                 theSize,
+                                                 &level);
+  
+  if (inChannel == 1 && !inIsInput) {
+    AudioObjectPropertyAddress theAddress = { kAudioDevicePropertyVolumeScalar,
+      theScope,
+      2 };
+    theError = AudioObjectSetPropertyData(inDevice,
+                                          &theAddress,
+                                          0,
+                                          NULL,
+                                          theSize,
+                                          &level);
+  }
+
+}

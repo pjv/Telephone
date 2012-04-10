@@ -137,7 +137,7 @@
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSliderCell" key="NSCell" id="577058121">
-							<int key="NSCellFlags">-2080244224</int>
+							<int key="NSCellFlags">-2079981824</int>
 							<int key="NSCellFlags2">0</int>
 							<string key="NSContents"/>
 							<string key="NSCellIdentifier">_NS:9</string>
@@ -162,7 +162,7 @@
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSliderCell" key="NSCell" id="62844619">
-							<int key="NSCellFlags">-2080244224</int>
+							<int key="NSCellFlags">-2079981824</int>
 							<int key="NSCellFlags2">0</int>
 							<string key="NSContents"/>
 							<string key="NSCellIdentifier">_NS:9</string>
@@ -257,9 +257,12 @@
 				<string key="NSClassName">AKActiveCallView</string>
 			</object>
 			<object class="NSButton" id="627322493">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
 				<string key="NSFrameSize">{14, 14}</string>
+				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
+				<reference key="NSNextKeyView"/>
 				<bool key="NSEnabled">YES</bool>
 				<object class="NSButtonCell" key="NSCell" id="1041027187">
 					<int key="NSCellFlags">67239424</int>
